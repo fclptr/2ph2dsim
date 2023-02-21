@@ -1,10 +1,33 @@
 
-from bottle import Bottle, run
+import os
+import http.server
+import socketserver
 
-app = Bottle()
+from http import HTTPStatus
 
-@app.route('/')
-def hello():
-    return "Hello World!"
+def get_file(path):
+  
+  data =  "// javascript content at path: "+path+"\n"
+  data += "/////////////////////////////////////////////////\n\n"
+  
+  try:
+    with open(path, "r") as f_in:      
+      data += f_in.read()
+      
+  except IOError as e:
+    data ="// no javascript content at: "+path+"\n"
+    
+  return data;
 
-run(app, host='0.0.0.0', port=8080)
+class Handler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(HTTPStatus.OK)
+        self.end_headers()       
+        src = get_file(self.path.strip("\\/"))
+        self.wfile.write(src.encode())
+
+
+port = int(os.getenv('PORT', 80))
+print('Listening on port %s' % (port))
+httpd = socketserver.TCPServer(('', port), Handler)
+httpd.serve_forever()
