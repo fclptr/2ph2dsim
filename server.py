@@ -11,7 +11,7 @@ def get_file(path):
   data += "/////////////////////////////////////////////////\n\n"
   
   try:
-    with open(path, "r") as f_in:      
+    with open("js/"+path, "r") as f_in:      
       data += f_in.read()
       
   except IOError as e:
@@ -27,7 +27,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(src.encode())
 
 
-port = int(os.getenv('PORT', 80))
+port = int(os.getenv('PORT', 8080))
 print('Listening on port %s' % (port))
 httpd = socketserver.TCPServer(('', port), Handler)
 httpd.serve_forever()
